@@ -1,17 +1,17 @@
-# mqttcli - MQTT Command Line Interface
+# edgeo-mqtt - MQTT Command Line Interface
 
 A complete MQTT 5.0 command-line client for testing, debugging, monitoring, and benchmarking MQTT brokers.
 
 ## Installation
 
 ```bash
-go build -o mqttcli ./cmd/mqttcli
+go build -o edgeo-mqtt ./cmd/edgeo-mqtt
 ```
 
 Or with version information:
 
 ```bash
-go build -ldflags "-X main.version=1.0.0 -X main.commit=$(git rev-parse HEAD) -X main.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)" -o mqttcli ./cmd/mqttcli
+go build -ldflags "-X main.version=1.0.0 -X main.commit=$(git rev-parse HEAD) -X main.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)" -o edgeo-mqtt ./cmd/edgeo-mqtt
 ```
 
 ## Commands Overview
@@ -63,7 +63,7 @@ These flags are available for all commands:
 
 | Flag | Description |
 |------|-------------|
-| `--config` | Config file path (default: `~/.mqttcli.yaml`) |
+| `--config` | Config file path (default: `~/.edgeo-mqtt.yaml`) |
 
 ## Broker URI Formats
 
@@ -81,7 +81,7 @@ Publish messages to an MQTT topic.
 ### Usage
 
 ```bash
-mqttcli pub -t <topic> -m <message> [flags]
+edgeo-mqtt pub -t <topic> -m <message> [flags]
 ```
 
 ### Flags
@@ -111,26 +111,26 @@ mqttcli pub -t <topic> -m <message> [flags]
 
 ```bash
 # Simple publish
-mqttcli pub -t "sensor/temp" -m "23.5"
+edgeo-mqtt pub -t "sensor/temp" -m "23.5"
 
 # QoS 1 with retain
-mqttcli pub -t "config/device" -m '{"enabled":true}' -q 1 --retain
+edgeo-mqtt pub -t "config/device" -m '{"enabled":true}' -q 1 --retain
 
 # From file
-mqttcli pub -t "data/batch" -f payload.json
+edgeo-mqtt pub -t "data/batch" -f payload.json
 
 # From stdin
-echo "hello" | mqttcli pub -t "test"
-cat data.json | mqttcli pub -t "data"
+echo "hello" | edgeo-mqtt pub -t "test"
+cat data.json | edgeo-mqtt pub -t "data"
 
 # Repeated publishing
-mqttcli pub -t "heartbeat" -m "ping" -n 100 -i 1s
+edgeo-mqtt pub -t "heartbeat" -m "ping" -n 100 -i 1s
 
 # Template with counter ({n} is replaced)
-mqttcli pub -t "test" -m "message-{n}" -n 10
+edgeo-mqtt pub -t "test" -m "message-{n}" -n 10
 
 # MQTT 5.0 request/response
-mqttcli pub -t "request/123" -m '{"action":"get"}' \
+edgeo-mqtt pub -t "request/123" -m '{"action":"get"}' \
   --response-topic "response/123" \
   --correlation-data "req-001" \
   --content-type "application/json"
@@ -143,7 +143,7 @@ Subscribe to topics and display received messages.
 ### Usage
 
 ```bash
-mqttcli sub -t <topic> [flags]
+edgeo-mqtt sub -t <topic> [flags]
 ```
 
 ### Flags
@@ -162,23 +162,23 @@ mqttcli sub -t <topic> [flags]
 
 ```bash
 # Subscribe to single topic
-mqttcli sub -t "sensor/temp"
+edgeo-mqtt sub -t "sensor/temp"
 
 # Wildcards
-mqttcli sub -t "sensor/#"
-mqttcli sub -t "sensor/+/temp"
+edgeo-mqtt sub -t "sensor/#"
+edgeo-mqtt sub -t "sensor/+/temp"
 
 # Multiple topics
-mqttcli sub -t "sensor/#" -t "actuator/#"
+edgeo-mqtt sub -t "sensor/#" -t "actuator/#"
 
 # Limit messages
-mqttcli sub -t "events" -c 10
+edgeo-mqtt sub -t "events" -c 10
 
 # JSON output with timestamps
-mqttcli sub -t "data" -o json --timestamps
+edgeo-mqtt sub -t "data" -o json --timestamps
 
 # Show MQTT 5.0 properties
-mqttcli sub -t "request/#" --show-properties
+edgeo-mqtt sub -t "request/#" --show-properties
 ```
 
 ## Command: watch
@@ -188,7 +188,7 @@ Monitor topics in real-time with a continuously updating display.
 ### Usage
 
 ```bash
-mqttcli watch -t <topic> [flags]
+edgeo-mqtt watch -t <topic> [flags]
 ```
 
 ### Flags
@@ -206,16 +206,16 @@ mqttcli watch -t <topic> [flags]
 
 ```bash
 # Watch with live updates
-mqttcli watch -t "sensor/#"
+edgeo-mqtt watch -t "sensor/#"
 
 # Show only changes
-mqttcli watch -t "sensor/temp" --diff
+edgeo-mqtt watch -t "sensor/temp" --diff
 
 # Threshold alerts
-mqttcli watch -t "sensor/temp" --alert-high 30 --alert-low 10
+edgeo-mqtt watch -t "sensor/temp" --alert-high 30 --alert-low 10
 
 # Log to file
-mqttcli watch -t "data/#" --log messages.csv
+edgeo-mqtt watch -t "data/#" --log messages.csv
 ```
 
 ## Command: info
@@ -225,7 +225,7 @@ Display broker connection information and server properties.
 ### Usage
 
 ```bash
-mqttcli info [flags]
+edgeo-mqtt info [flags]
 ```
 
 ### Flags
@@ -238,13 +238,13 @@ mqttcli info [flags]
 
 ```bash
 # Basic connection info
-mqttcli info
+edgeo-mqtt info
 
 # Include broker statistics
-mqttcli info --sys
+edgeo-mqtt info --sys
 
 # JSON output
-mqttcli info -o json
+edgeo-mqtt info -o json
 ```
 
 ## Command: topics
@@ -254,7 +254,7 @@ Discover available topics by listening for messages.
 ### Usage
 
 ```bash
-mqttcli topics [flags]
+edgeo-mqtt topics [flags]
 ```
 
 ### Flags
@@ -269,13 +269,13 @@ mqttcli topics [flags]
 
 ```bash
 # Discover all topics (5 seconds)
-mqttcli topics -d 5s
+edgeo-mqtt topics -d 5s
 
 # Discover specific pattern
-mqttcli topics -t "sensor/#" -d 30s
+edgeo-mqtt topics -t "sensor/#" -d 30s
 
 # List $SYS broker topics
-mqttcli topics --sys
+edgeo-mqtt topics --sys
 ```
 
 ## Command: interactive
@@ -285,7 +285,7 @@ Start an interactive MQTT shell session.
 ### Usage
 
 ```bash
-mqttcli interactive [flags]
+edgeo-mqtt interactive [flags]
 ```
 
 ### Shell Commands
@@ -306,7 +306,7 @@ mqttcli interactive [flags]
 ### Example Session
 
 ```
-$ mqttcli interactive -b mqtt://localhost:1883
+$ edgeo-mqtt interactive -b mqtt://localhost:1883
 MQTT Interactive Shell
 Type 'help' for available commands
 
@@ -343,7 +343,7 @@ Run performance benchmarks on MQTT operations.
 
 | Flag | Short | Default | Description |
 |------|-------|---------|-------------|
-| `--topic` | `-t` | `mqttcli/bench` | Topic for benchmark |
+| `--topic` | `-t` | `edgeo-mqtt/bench` | Topic for benchmark |
 | `--count` | `-n` | `10000` | Number of messages |
 | `--clients` | `-c` | `1` | Number of concurrent clients |
 | `--payload` | `-s` | `100` | Payload size in bytes |
@@ -354,19 +354,19 @@ Run performance benchmarks on MQTT operations.
 
 ```bash
 # Benchmark publishing (10000 messages, 10 clients)
-mqttcli bench pub -t "bench" -n 10000 -c 10
+edgeo-mqtt bench pub -t "bench" -n 10000 -c 10
 
 # Benchmark with larger payload
-mqttcli bench pub -t "bench" -n 5000 -s 1024
+edgeo-mqtt bench pub -t "bench" -n 5000 -s 1024
 
 # Benchmark subscribing
-mqttcli bench sub -t "bench/#" -c 5 -d 30s
+edgeo-mqtt bench sub -t "bench/#" -c 5 -d 30s
 
 # Measure round-trip latency
-mqttcli bench pubsub -t "bench" -n 1000
+edgeo-mqtt bench pubsub -t "bench" -n 1000
 
 # QoS 1 benchmark
-mqttcli bench pub -t "bench" -n 1000 -q 1
+edgeo-mqtt bench pub -t "bench" -n 1000 -q 1
 ```
 
 ### Output Metrics
@@ -380,12 +380,12 @@ mqttcli bench pub -t "bench" -n 1000 -q 1
 
 ## Configuration File
 
-Create `~/.mqttcli.yaml` for default settings:
+Create `~/.edgeo-mqtt.yaml` for default settings:
 
 ```yaml
 # Connection
 broker: mqtt://localhost:1883
-client-id: mqttcli-default
+client-id: edgeo-mqtt-default
 username: user
 password: secret
 
@@ -425,7 +425,7 @@ sensor/humidity [QoS0,R] 65
 ### JSON
 
 ```bash
-mqttcli sub -t "sensor/#" -o json
+edgeo-mqtt sub -t "sensor/#" -o json
 ```
 
 ```json
@@ -435,7 +435,7 @@ mqttcli sub -t "sensor/#" -o json
 ### CSV
 
 ```bash
-mqttcli sub -t "sensor/#" -o csv --timestamps
+edgeo-mqtt sub -t "sensor/#" -o csv --timestamps
 ```
 
 ```csv
@@ -446,7 +446,7 @@ timestamp,topic,payload,qos,retain
 ### Raw
 
 ```bash
-mqttcli sub -t "sensor/#" -o raw
+edgeo-mqtt sub -t "sensor/#" -o raw
 ```
 
 ```

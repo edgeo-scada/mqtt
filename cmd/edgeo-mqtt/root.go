@@ -31,9 +31,9 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "mqttcli",
+	Use:   "edgeo-mqtt",
 	Short: "MQTT command-line client",
-	Long: `mqttcli is a complete MQTT 5.0 command-line client for testing,
+	Long: `edgeo-mqtt is a complete MQTT 5.0 command-line client for testing,
 debugging, monitoring, and benchmarking MQTT brokers.
 
 Supports multiple transport protocols:
@@ -44,16 +44,16 @@ Supports multiple transport protocols:
 
 Examples:
   # Publish a message
-  mqttcli pub -t "sensor/temp" -m "23.5"
+  edgeo-mqtt pub -t "sensor/temp" -m "23.5"
 
   # Subscribe to a topic
-  mqttcli sub -t "sensor/#"
+  edgeo-mqtt sub -t "sensor/#"
 
   # Interactive mode
-  mqttcli interactive
+  edgeo-mqtt interactive
 
   # Benchmark publishing
-  mqttcli bench pub -t "bench" -n 10000`,
+  edgeo-mqtt bench pub -t "bench" -n 10000`,
 	SilenceUsage:  true,
 	SilenceErrors: true,
 }
@@ -62,7 +62,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	// Connection flags
-	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "", "", "config file (default is $HOME/.mqttcli.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "", "", "config file (default is $HOME/.edgeo-mqtt.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&broker, "broker", "b", "mqtt://localhost:1883", "MQTT broker URI")
 	rootCmd.PersistentFlags().StringVar(&clientID, "client-id", "", "client ID (auto-generated if empty)")
 	rootCmd.PersistentFlags().StringVarP(&username, "username", "u", "", "username for authentication")
@@ -105,11 +105,11 @@ func initConfig() {
 		}
 		viper.AddConfigPath(home)
 		viper.AddConfigPath(filepath.Join(home, ".config"))
-		viper.SetConfigName(".mqttcli")
+		viper.SetConfigName(".edgeo-mqtt")
 		viper.SetConfigType("yaml")
 	}
 
-	viper.SetEnvPrefix("MQTTCLI")
+	viper.SetEnvPrefix("EDGEO_MQTT")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err == nil {

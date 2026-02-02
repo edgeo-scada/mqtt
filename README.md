@@ -186,14 +186,14 @@ props := &mqtt.Properties{
 client.PublishWithProperties(ctx, "topic", payload, mqtt.QoS1, false, props)
 ```
 
-## CLI Tool (mqttcli)
+## CLI Tool (edgeo-mqtt)
 
 A complete MQTT 5.0 command-line client for testing, debugging, monitoring, and benchmarking.
 
 ### Installation
 
 ```bash
-go build -o mqttcli ./cmd/mqttcli
+go build -o edgeo-mqtt ./cmd/edgeo-mqtt
 ```
 
 ### Commands
@@ -224,29 +224,29 @@ go build -o mqttcli ./cmd/mqttcli
     --keepalive duration Keep-alive interval (default 1m)
 -o, --output string      Output format: table, json, csv, raw (default "table")
 -v, --verbose            Verbose output
-    --config string      Config file (default ~/.mqttcli.yaml)
+    --config string      Config file (default ~/.edgeo-mqtt.yaml)
 ```
 
 ### Publish Examples
 
 ```bash
 # Simple publish
-mqttcli pub -t "sensor/temp" -m "23.5"
+edgeo-mqtt pub -t "sensor/temp" -m "23.5"
 
 # Publish with QoS 1 and retain
-mqttcli pub -t "config/device" -m '{"enabled":true}' -q 1 --retain
+edgeo-mqtt pub -t "config/device" -m '{"enabled":true}' -q 1 --retain
 
 # Publish from file
-mqttcli pub -t "data/batch" -f payload.json
+edgeo-mqtt pub -t "data/batch" -f payload.json
 
 # Publish from stdin
-echo "hello" | mqttcli pub -t "test"
+echo "hello" | edgeo-mqtt pub -t "test"
 
 # Repeated publishing (100 messages, 1 second interval)
-mqttcli pub -t "heartbeat" -m "ping" -n 100 -i 1s
+edgeo-mqtt pub -t "heartbeat" -m "ping" -n 100 -i 1s
 
 # MQTT 5.0 properties
-mqttcli pub -t "request/123" -m "data" \
+edgeo-mqtt pub -t "request/123" -m "data" \
   --response-topic "response/123" \
   --correlation-data "req-001" \
   --content-type "application/json"
@@ -256,41 +256,41 @@ mqttcli pub -t "request/123" -m "data" \
 
 ```bash
 # Subscribe to a single topic
-mqttcli sub -t "sensor/temp"
+edgeo-mqtt sub -t "sensor/temp"
 
 # Subscribe with wildcards
-mqttcli sub -t "sensor/#"
+edgeo-mqtt sub -t "sensor/#"
 
 # Multiple topics
-mqttcli sub -t "sensor/#" -t "actuator/#"
+edgeo-mqtt sub -t "sensor/#" -t "actuator/#"
 
 # Limit to 10 messages
-mqttcli sub -t "events" -c 10
+edgeo-mqtt sub -t "events" -c 10
 
 # JSON output with timestamps
-mqttcli sub -t "data" -o json --timestamps
+edgeo-mqtt sub -t "data" -o json --timestamps
 ```
 
 ### Watch Mode (Real-time Monitoring)
 
 ```bash
 # Watch topics with live updates
-mqttcli watch -t "sensor/#"
+edgeo-mqtt watch -t "sensor/#"
 
 # Show only changed values
-mqttcli watch -t "sensor/temp" --diff
+edgeo-mqtt watch -t "sensor/temp" --diff
 
 # Alert on threshold values
-mqttcli watch -t "sensor/temp" --alert-high 30 --alert-low 10
+edgeo-mqtt watch -t "sensor/temp" --alert-high 30 --alert-low 10
 
 # Log messages to CSV file
-mqttcli watch -t "data/#" --log messages.csv
+edgeo-mqtt watch -t "data/#" --log messages.csv
 ```
 
 ### Interactive Mode
 
 ```bash
-mqttcli interactive -b mqtt://localhost:1883
+edgeo-mqtt interactive -b mqtt://localhost:1883
 ```
 
 Commands in interactive mode:
@@ -308,18 +308,18 @@ Commands in interactive mode:
 
 ```bash
 # Benchmark publishing (10000 messages, 10 clients)
-mqttcli bench pub -t "bench" -n 10000 -c 10
+edgeo-mqtt bench pub -t "bench" -n 10000 -c 10
 
 # Benchmark subscribing (5 clients)
-mqttcli bench sub -t "bench/#" -c 5
+edgeo-mqtt bench sub -t "bench/#" -c 5
 
 # Measure round-trip latency
-mqttcli bench pubsub -t "bench" -n 1000
+edgeo-mqtt bench pubsub -t "bench" -n 1000
 ```
 
 ### Configuration File
 
-Create `~/.mqttcli.yaml`:
+Create `~/.edgeo-mqtt.yaml`:
 
 ```yaml
 broker: mqtt://localhost:1883

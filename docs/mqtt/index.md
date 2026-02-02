@@ -87,7 +87,7 @@ func main() {
 | [Pool](pool.md) | Connection pooling |
 | [Errors](errors.md) | Gestion des erreurs |
 | [Metrics](metrics.md) | Métriques et monitoring |
-| [CLI](cli.md) | Outil en ligne de commande mqttcli |
+| [CLI](cli.md) | Outil en ligne de commande edgeo-mqtt |
 | [Changelog](changelog.md) | Historique des versions |
 
 ## Exemples

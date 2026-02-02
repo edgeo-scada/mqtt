@@ -39,7 +39,7 @@ func buildClientOptions() []mqtt.Option {
 	if clientID != "" {
 		opts = append(opts, mqtt.WithClientID(clientID))
 	} else {
-		opts = append(opts, mqtt.WithClientID(fmt.Sprintf("mqttcli-%d", time.Now().UnixNano())))
+		opts = append(opts, mqtt.WithClientID(fmt.Sprintf("edgeo-mqtt-%d", time.Now().UnixNano())))
 	}
 
 	if username != "" {

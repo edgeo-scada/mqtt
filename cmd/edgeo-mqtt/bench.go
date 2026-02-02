@@ -30,13 +30,13 @@ Sub-commands:
 
 Examples:
   # Benchmark publishing 10000 messages with 10 clients
-  mqttcli bench pub -t "bench" -n 10000 -c 10
+  edgeo-mqtt bench pub -t "bench" -n 10000 -c 10
 
   # Benchmark subscribing with 5 clients
-  mqttcli bench sub -t "bench/#" -c 5
+  edgeo-mqtt bench sub -t "bench/#" -c 5
 
   # Measure round-trip latency
-  mqttcli bench pubsub -t "bench" -n 1000`,
+  edgeo-mqtt bench pubsub -t "bench" -n 1000`,
 }
 
 var benchPubCmd = &cobra.Command{
@@ -75,7 +75,7 @@ func init() {
 
 	// Common flags for all bench subcommands
 	for _, cmd := range []*cobra.Command{benchPubCmd, benchSubCmd, benchPubSubCmd} {
-		cmd.Flags().StringVarP(&benchTopic, "topic", "t", "mqttcli/bench", "topic for benchmark")
+		cmd.Flags().StringVarP(&benchTopic, "topic", "t", "edgeo-mqtt/bench", "topic for benchmark")
 		cmd.Flags().IntVarP(&benchCount, "count", "n", 10000, "number of messages")
 		cmd.Flags().IntVarP(&benchClients, "clients", "c", 1, "number of concurrent clients")
 		cmd.Flags().IntVarP(&benchPayload, "payload", "s", 100, "payload size in bytes")

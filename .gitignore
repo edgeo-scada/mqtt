@@ -1,3 +1,4 @@
 # Binaries
-/mqttcli
+/edgeo-mqtt
+/bin/
 *.exe

@@ -27,16 +27,16 @@ updated view of message values with statistics.
 
 Examples:
   # Watch topics with live updates
-  mqttcli watch -t "sensor/#"
+  edgeo-mqtt watch -t "sensor/#"
 
   # Show changes only (diff mode)
-  mqttcli watch -t "sensor/temp" --diff
+  edgeo-mqtt watch -t "sensor/temp" --diff
 
   # Alert on threshold values
-  mqttcli watch -t "sensor/temp" --alert-high 30 --alert-low 10
+  edgeo-mqtt watch -t "sensor/temp" --alert-high 30 --alert-low 10
 
   # Log messages to CSV file
-  mqttcli watch -t "data/#" --log messages.csv`,
+  edgeo-mqtt watch -t "data/#" --log messages.csv`,
 	RunE: runWatch,
 }
 

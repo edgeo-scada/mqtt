@@ -24,13 +24,13 @@ server capabilities, and optionally reads $SYS topics for broker statistics.
 
 Examples:
   # Basic connection info
-  mqttcli info
+  edgeo-mqtt info
 
   # Include $SYS broker statistics
-  mqttcli info --sys
+  edgeo-mqtt info --sys
 
   # JSON output
-  mqttcli info -o json`,
+  edgeo-mqtt info -o json`,
 	RunE: runInfo,
 }
 

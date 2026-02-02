@@ -29,7 +29,7 @@ func init() {
 }
 
 func printVersion() {
-	fmt.Printf("mqttcli version %s\n", version)
+	fmt.Printf("edgeo-mqtt version %s\n", version)
 	fmt.Printf("  MQTT Library:  %s\n", mqtt.Version)
 	fmt.Printf("  MQTT Protocol: %d (%s)\n", mqtt.ProtocolVersion, mqtt.ProtocolName)
 	fmt.Printf("  Go version:    %s\n", runtime.Version())

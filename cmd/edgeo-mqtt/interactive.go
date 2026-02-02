@@ -40,8 +40,8 @@ Commands:
   quit, exit            Exit interactive mode
 
 Examples:
-  mqttcli interactive
-  mqttcli interactive -b mqtt://broker:1883`,
+  edgeo-mqtt interactive
+  edgeo-mqtt interactive -b mqtt://broker:1883`,
 	RunE: runInteractive,
 }
 

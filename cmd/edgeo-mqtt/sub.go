@@ -24,19 +24,19 @@ Supports MQTT wildcards:
 
 Examples:
   # Subscribe to a single topic
-  mqttcli sub -t "sensor/temp"
+  edgeo-mqtt sub -t "sensor/temp"
 
   # Subscribe to multiple topics
-  mqttcli sub -t "sensor/#" -t "actuator/#"
+  edgeo-mqtt sub -t "sensor/#" -t "actuator/#"
 
   # Limit to 10 messages
-  mqttcli sub -t "events" -c 10
+  edgeo-mqtt sub -t "events" -c 10
 
   # JSON output with timestamps
-  mqttcli sub -t "data" -o json --timestamps
+  edgeo-mqtt sub -t "data" -o json --timestamps
 
   # Show MQTT 5.0 properties
-  mqttcli sub -t "request/#" --show-properties`,
+  edgeo-mqtt sub -t "request/#" --show-properties`,
 	RunE: runSub,
 }
 

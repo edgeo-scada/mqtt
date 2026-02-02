@@ -25,13 +25,13 @@ unique topics seen during the observation period.
 
 Examples:
   # Discover all topics by listening for 10 seconds
-  mqttcli topics -t "#" -d 10s
+  edgeo-mqtt topics -t "#" -d 10s
 
   # List $SYS broker topics
-  mqttcli topics --sys
+  edgeo-mqtt topics --sys
 
   # Watch specific topic pattern
-  mqttcli topics -t "sensor/#" -d 30s`,
+  edgeo-mqtt topics -t "sensor/#" -d 30s`,
 	RunE: runTopics,
 }
 

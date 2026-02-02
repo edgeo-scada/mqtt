@@ -25,22 +25,22 @@ The message payload can be provided via:
 
 Examples:
   # Simple publish
-  mqttcli pub -t "sensor/temp" -m "23.5"
+  edgeo-mqtt pub -t "sensor/temp" -m "23.5"
 
   # Publish with QoS 1 and retain
-  mqttcli pub -t "config/device1" -m '{"enabled":true}' -q 1 --retain
+  edgeo-mqtt pub -t "config/device1" -m '{"enabled":true}' -q 1 --retain
 
   # Publish from file
-  mqttcli pub -t "data/batch" -f payload.json
+  edgeo-mqtt pub -t "data/batch" -f payload.json
 
   # Publish from stdin
-  echo "hello" | mqttcli pub -t "test"
+  echo "hello" | edgeo-mqtt pub -t "test"
 
   # Repeated publishing (100 messages, 1 second interval)
-  mqttcli pub -t "heartbeat" -m "ping" -n 100 -i 1s
+  edgeo-mqtt pub -t "heartbeat" -m "ping" -n 100 -i 1s
 
   # MQTT 5.0 properties
-  mqttcli pub -t "request/123" -m "data" \
+  edgeo-mqtt pub -t "request/123" -m "data" \
     --response-topic "response/123" \
     --correlation-data "req-001" \
     --content-type "application/json"`,
