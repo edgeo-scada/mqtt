@@ -36,7 +36,7 @@ Cette bibliothèque fournit une implémentation complète du protocole MQTT 5.0 
 ## Installation
 
 ```bash
-go get github.com/edgeo/drivers/mqtt
+go get github.com/edgeo-scada/mqtt
 ```
 
 ## Exemple rapide
@@ -48,7 +48,7 @@ import (
     "context"
     "log"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {

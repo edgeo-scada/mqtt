@@ -13,7 +13,7 @@ import (
     "os"
     "os/signal"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -59,7 +59,7 @@ import (
     "os"
     "os/signal"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -106,7 +106,7 @@ import (
     "os"
     "os/signal"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -164,7 +164,7 @@ import (
     "os"
     "os/signal"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 type SensorData struct {
@@ -223,7 +223,7 @@ import (
     "os/signal"
     "time"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -277,7 +277,7 @@ import (
     "os"
     "os/signal"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -351,7 +351,7 @@ import (
     "os/signal"
     "time"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -406,7 +406,7 @@ import (
     "log"
     "time"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {

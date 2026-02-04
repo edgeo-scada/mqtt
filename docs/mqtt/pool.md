@@ -212,7 +212,7 @@ import (
     "sync"
     "time"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 type SensorReading struct {
@@ -321,7 +321,7 @@ import (
     "log"
     "sync"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {

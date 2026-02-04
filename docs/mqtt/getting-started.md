@@ -10,7 +10,7 @@ Guide de démarrage rapide pour la bibliothèque MQTT.
 ## Installation
 
 ```bash
-go get github.com/edgeo/drivers/mqtt
+go get github.com/edgeo-scada/mqtt
 ```
 
 ## Premier client
@@ -25,7 +25,7 @@ import (
     "log"
     "time"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -72,7 +72,7 @@ import (
     "os/signal"
     "time"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {

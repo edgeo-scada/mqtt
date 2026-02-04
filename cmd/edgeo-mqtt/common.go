@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/edgeo/drivers/mqtt/mqtt"
+	"github.com/edgeo-scada/mqtt/mqtt"
 )
 
 // createClient creates and connects an MQTT client with the current configuration.

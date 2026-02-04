@@ -1,4 +1,4 @@
-module github.com/edgeo/drivers/mqtt
+module github.com/edgeo-scada/mqtt
 
 go 1.22
 

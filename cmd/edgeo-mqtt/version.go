@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/edgeo/drivers/mqtt/mqtt"
+	"github.com/edgeo-scada/mqtt/mqtt"
 	"github.com/spf13/cobra"
 )
 

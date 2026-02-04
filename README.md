@@ -17,7 +17,7 @@ A pure Go MQTT 5.0 client library with support for TLS, WebSocket, and connectio
 ## Installation
 
 ```bash
-go get github.com/edgeo/drivers/mqtt
+go get github.com/edgeo-scada/mqtt
 ```
 
 ## Quick Start
@@ -32,7 +32,7 @@ import (
     "log"
     "time"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
@@ -65,7 +65,7 @@ import (
     "os"
     "os/signal"
 
-    "github.com/edgeo/drivers/mqtt/mqtt"
+    "github.com/edgeo-scada/mqtt/mqtt"
 )
 
 func main() {
