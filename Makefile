@@ -1,105 +1,144 @@
-# Makefile for edgeo-mqtt CLI
+# MQTT Driver Makefile
 
-BINARY_NAME := edgeo-mqtt
-CMD_PATH := ./cmd/edgeo-mqtt
-OUTPUT_DIR := bin
+BINARY_NAME=edgeo-mqtt
+VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+BUILD_TIME=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
+LDFLAGS=-ldflags "-X main.version=$(VERSION) -X main.buildTime=$(BUILD_TIME) -s -w"
 
-# Version information
-VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
-COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-BUILD_DATE := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
+# Go parameters
+GOCMD=go
+GOBUILD=$(GOCMD) build
+GOCLEAN=$(GOCMD) clean
+GOTEST=$(GOCMD) test
+GOGET=$(GOCMD) get
+GOMOD=$(GOCMD) mod
 
-# Go build flags
-LDFLAGS := -s -w \
-	-X main.version=$(VERSION) \
-	-X main.commit=$(COMMIT) \
-	-X main.buildDate=$(BUILD_DATE)
+# Directories
+CMD_DIR=./cmd/edgeo-mqtt
+BIN_DIR=./bin
+LIB_DIR=./mqtt
 
-# Default target
-.PHONY: all
-all: build
+# Build targets
+.PHONY: all build build-all clean test deps lint install help
+
+all: deps build
 
 # Build for current platform
-.PHONY: build
 build:
-	go build -ldflags "$(LDFLAGS)" -o $(BINARY_NAME) $(CMD_PATH)
+	@echo "Building $(BINARY_NAME)..."
+	@mkdir -p $(BIN_DIR)
+	$(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME) $(CMD_DIR)
+	@echo "Built: $(BIN_DIR)/$(BINARY_NAME)"
 
 # Build for all platforms
-.PHONY: build-all
-build-all: build-linux build-darwin build-windows
+build-all: clean deps
+	@echo "Building for all platforms..."
+	@mkdir -p $(BIN_DIR)
 
-# Linux builds
-.PHONY: build-linux
-build-linux: build-linux-amd64 build-linux-arm64
+	@echo "Building darwin/amd64..."
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-darwin-amd64 $(CMD_DIR)
 
-.PHONY: build-linux-amd64
-build-linux-amd64:
-	@mkdir -p $(OUTPUT_DIR)
-	GOOS=linux GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $(OUTPUT_DIR)/$(BINARY_NAME)-linux-amd64 $(CMD_PATH)
+	@echo "Building darwin/arm64..."
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-darwin-arm64 $(CMD_DIR)
 
-.PHONY: build-linux-arm64
-build-linux-arm64:
-	@mkdir -p $(OUTPUT_DIR)
-	GOOS=linux GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o $(OUTPUT_DIR)/$(BINARY_NAME)-linux-arm64 $(CMD_PATH)
+	@echo "Building linux/amd64..."
+	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-amd64 $(CMD_DIR)
 
-# macOS builds
-.PHONY: build-darwin
-build-darwin: build-darwin-amd64 build-darwin-arm64
+	@echo "Building linux/arm64..."
+	GOOS=linux GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-arm64 $(CMD_DIR)
 
-.PHONY: build-darwin-amd64
-build-darwin-amd64:
-	@mkdir -p $(OUTPUT_DIR)
-	GOOS=darwin GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $(OUTPUT_DIR)/$(BINARY_NAME)-darwin-amd64 $(CMD_PATH)
+	@echo "Building linux/arm..."
+	GOOS=linux GOARCH=arm $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-arm $(CMD_DIR)
 
-.PHONY: build-darwin-arm64
-build-darwin-arm64:
-	@mkdir -p $(OUTPUT_DIR)
-	GOOS=darwin GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o $(OUTPUT_DIR)/$(BINARY_NAME)-darwin-arm64 $(CMD_PATH)
+	@echo "Building windows/amd64..."
+	GOOS=windows GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-windows-amd64.exe $(CMD_DIR)
 
-# Windows builds
-.PHONY: build-windows
-build-windows: build-windows-amd64 build-windows-arm64
+	@echo "Building windows/arm64..."
+	GOOS=windows GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-windows-arm64.exe $(CMD_DIR)
 
-.PHONY: build-windows-amd64
-build-windows-amd64:
-	@mkdir -p $(OUTPUT_DIR)
-	GOOS=windows GOARCH=amd64 go build -ldflags "$(LDFLAGS)" -o $(OUTPUT_DIR)/$(BINARY_NAME)-windows-amd64.exe $(CMD_PATH)
+	@echo "All builds complete!"
+	@ls -la $(BIN_DIR)/
 
-.PHONY: build-windows-arm64
-build-windows-arm64:
-	@mkdir -p $(OUTPUT_DIR)
-	GOOS=windows GOARCH=arm64 go build -ldflags "$(LDFLAGS)" -o $(OUTPUT_DIR)/$(BINARY_NAME)-windows-arm64.exe $(CMD_PATH)
+# Platform-specific builds
+darwin: deps
+	@mkdir -p $(BIN_DIR)
+	GOOS=darwin GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-darwin-amd64 $(CMD_DIR)
+	GOOS=darwin GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-darwin-arm64 $(CMD_DIR)
 
-# Install locally
-.PHONY: install
-install:
-	go install -ldflags "$(LDFLAGS)" $(CMD_PATH)
+linux: deps
+	@mkdir -p $(BIN_DIR)
+	GOOS=linux GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-amd64 $(CMD_DIR)
+	GOOS=linux GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-arm64 $(CMD_DIR)
+	GOOS=linux GOARCH=arm $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-linux-arm $(CMD_DIR)
 
-# Run tests
-.PHONY: test
-test:
-	go test -v ./...
+windows: deps
+	@mkdir -p $(BIN_DIR)
+	GOOS=windows GOARCH=amd64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-windows-amd64.exe $(CMD_DIR)
+	GOOS=windows GOARCH=arm64 $(GOBUILD) $(LDFLAGS) -o $(BIN_DIR)/$(BINARY_NAME)-windows-arm64.exe $(CMD_DIR)
 
 # Clean build artifacts
-.PHONY: clean
 clean:
-	rm -f $(BINARY_NAME)
-	rm -rf $(OUTPUT_DIR)
+	@echo "Cleaning..."
+	$(GOCLEAN)
+	rm -rf $(BIN_DIR)
 
-# Show help
-.PHONY: help
+# Run tests
+test:
+	@echo "Running tests..."
+	$(GOTEST) -v ./...
+
+# Run tests with coverage
+test-coverage:
+	@echo "Running tests with coverage..."
+	$(GOTEST) -v -coverprofile=coverage.out ./...
+	$(GOCMD) tool cover -html=coverage.out -o coverage.html
+	@echo "Coverage report: coverage.html"
+
+# Download dependencies
+deps:
+	@echo "Downloading dependencies..."
+	$(GOMOD) download
+	$(GOMOD) tidy
+
+# Lint code
+lint:
+	@echo "Linting..."
+	@which golangci-lint > /dev/null || (echo "Installing golangci-lint..." && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
+	golangci-lint run ./...
+
+# Format code
+fmt:
+	@echo "Formatting..."
+	$(GOCMD) fmt ./...
+
+# Install to GOPATH/bin
+install: build
+	@echo "Installing..."
+	cp $(BIN_DIR)/$(BINARY_NAME) $(GOPATH)/bin/
+
+# Run the application
+run: build
+	$(BIN_DIR)/$(BINARY_NAME)
+
+# Help
 help:
-	@echo "Available targets:"
-	@echo "  build              Build for current platform"
-	@echo "  build-all          Build for all platforms (Linux, macOS, Windows)"
-	@echo "  build-linux        Build for Linux (amd64, arm64)"
-	@echo "  build-darwin       Build for macOS (amd64, arm64)"
-	@echo "  build-windows      Build for Windows (amd64, arm64)"
-	@echo "  install            Install to GOPATH/bin"
-	@echo "  test               Run tests"
-	@echo "  clean              Remove build artifacts"
+	@echo "MQTT Driver Makefile"
 	@echo ""
-	@echo "Individual platform targets:"
-	@echo "  build-linux-amd64    build-linux-arm64"
-	@echo "  build-darwin-amd64   build-darwin-arm64"
-	@echo "  build-windows-amd64  build-windows-arm64"
+	@echo "Usage:"
+	@echo "  make              Build for current platform"
+	@echo "  make build        Build for current platform"
+	@echo "  make build-all    Build for all platforms"
+	@echo "  make darwin       Build for macOS (amd64 + arm64)"
+	@echo "  make linux        Build for Linux (amd64 + arm64 + arm)"
+	@echo "  make windows      Build for Windows (amd64 + arm64)"
+	@echo "  make clean        Remove build artifacts"
+	@echo "  make test         Run tests"
+	@echo "  make test-coverage Run tests with coverage report"
+	@echo "  make deps         Download dependencies"
+	@echo "  make lint         Run linter"
+	@echo "  make fmt          Format code"
+	@echo "  make install      Install to GOPATH/bin"
+	@echo "  make run          Build and run"
+	@echo "  make help         Show this help"
+	@echo ""
+	@echo "Version: $(VERSION)"

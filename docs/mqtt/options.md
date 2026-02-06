@@ -1,24 +1,24 @@
-# Options de configuration
+# Configuration Options
 
-Documentation complète des options de configuration du client MQTT.
+Complete documentation of MQTT client configuration options.
 
-## Options de connexion
+## Connection Options
 
 ### WithServer
 
-Ajoute un URI de broker MQTT.
+Adds an MQTT broker URI.
 
 ```go
 mqtt.WithServer(uri string) Option
 ```
 
-**Schémas supportés:**
-- `mqtt://` ou `tcp://` - TCP standard (port 1883)
-- `mqtts://`, `ssl://` ou `tls://` - TLS (port 8883)
+**Supported schemes:**
+- `mqtt://` or `tcp://` - Standard TCP (port 1883)
+- `mqtts://`, `ssl://` or `tls://` - TLS (port 8883)
 - `ws://` - WebSocket (port 80)
 - `wss://` - WebSocket Secure (port 443)
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithServer("mqtt://localhost:1883")
@@ -28,13 +28,13 @@ mqtt.WithServer("wss://broker.example.com/mqtt")
 
 ### WithServers
 
-Configure plusieurs brokers pour le failover.
+Configures multiple brokers for failover.
 
 ```go
 mqtt.WithServers(uris ...string) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithServers(
@@ -46,13 +46,13 @@ mqtt.WithServers(
 
 ### WithClientID
 
-Définit l'identifiant du client.
+Sets the client identifier.
 
 ```go
 mqtt.WithClientID(id string) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithClientID("my-application-001")
@@ -60,26 +60,26 @@ mqtt.WithClientID("my-application-001")
 
 ### WithCleanStart
 
-Active ou désactive le clean start (nouvelle session).
+Enables or disables clean start (new session).
 
 ```go
 mqtt.WithCleanStart(clean bool) Option
 ```
 
-- `true` - Démarre une nouvelle session (défaut)
-- `false` - Reprend la session existante si disponible
+- `true` - Starts a new session (default)
+- `false` - Resumes existing session if available
 
 ### WithKeepAlive
 
-Définit l'intervalle de keep-alive.
+Sets the keep-alive interval.
 
 ```go
 mqtt.WithKeepAlive(d time.Duration) Option
 ```
 
-**Défaut:** 60 secondes
+**Default:** 60 seconds
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithKeepAlive(30 * time.Second)
@@ -87,54 +87,54 @@ mqtt.WithKeepAlive(30 * time.Second)
 
 ### WithConnectTimeout
 
-Définit le timeout de connexion.
+Sets the connection timeout.
 
 ```go
 mqtt.WithConnectTimeout(d time.Duration) Option
 ```
 
-**Défaut:** 30 secondes
+**Default:** 30 seconds
 
 ### WithWriteTimeout
 
-Définit le timeout d'écriture.
+Sets the write timeout.
 
 ```go
 mqtt.WithWriteTimeout(d time.Duration) Option
 ```
 
-**Défaut:** 10 secondes
+**Default:** 10 seconds
 
-## Options d'authentification
+## Authentication Options
 
 ### WithCredentials
 
-Configure l'authentification par username/password.
+Configures username/password authentication.
 
 ```go
 mqtt.WithCredentials(username, password string) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithCredentials("user", "secret123")
 ```
 
-## Options TLS
+## TLS Options
 
 ### WithTLS
 
-Configure TLS avec une configuration personnalisée.
+Configures TLS with a custom configuration.
 
 ```go
 mqtt.WithTLS(config *tls.Config) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
-// Avec certificat client
+// With client certificate
 cert, _ := tls.LoadX509KeyPair("client.crt", "client.key")
 
 mqtt.WithTLS(&tls.Config{
@@ -146,19 +146,19 @@ mqtt.WithTLS(&tls.Config{
 
 ### WithTLSInsecure
 
-Désactive la vérification du certificat serveur.
+Disables server certificate verification.
 
 ```go
 mqtt.WithTLSInsecure() Option
 ```
 
-> **Attention:** À utiliser uniquement pour les tests.
+> **Warning:** Use only for testing.
 
-## Options WebSocket
+## WebSocket Options
 
 ### WithWebSocket
 
-Active le transport WebSocket.
+Enables WebSocket transport.
 
 ```go
 mqtt.WithWebSocket(enabled bool) Option
@@ -166,114 +166,114 @@ mqtt.WithWebSocket(enabled bool) Option
 
 ### WithWebSocketPath
 
-Définit le chemin de l'endpoint WebSocket.
+Sets the WebSocket endpoint path.
 
 ```go
 mqtt.WithWebSocketPath(path string) Option
 ```
 
-**Défaut:** `/mqtt`
+**Default:** `/mqtt`
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithWebSocketPath("/ws/mqtt")
 ```
 
-## Options de reconnexion
+## Reconnection Options
 
 ### WithAutoReconnect
 
-Active ou désactive la reconnexion automatique.
+Enables or disables automatic reconnection.
 
 ```go
 mqtt.WithAutoReconnect(enabled bool) Option
 ```
 
-**Défaut:** true
+**Default:** true
 
 ### WithConnectRetryInterval
 
-Définit l'intervalle initial de retry.
+Sets the initial retry interval.
 
 ```go
 mqtt.WithConnectRetryInterval(d time.Duration) Option
 ```
 
-**Défaut:** 1 seconde
+**Default:** 1 second
 
 ### WithMaxReconnectInterval
 
-Définit l'intervalle maximum de retry (backoff).
+Sets the maximum retry interval (backoff).
 
 ```go
 mqtt.WithMaxReconnectInterval(d time.Duration) Option
 ```
 
-**Défaut:** 2 minutes
+**Default:** 2 minutes
 
 ### WithMaxRetries
 
-Définit le nombre maximum de tentatives de reconnexion.
+Sets the maximum number of reconnection attempts.
 
 ```go
 mqtt.WithMaxRetries(n int) Option
 ```
 
-**Défaut:** 0 (illimité)
+**Default:** 0 (unlimited)
 
-## Options MQTT 5.0
+## MQTT 5.0 Options
 
 ### WithSessionExpiryInterval
 
-Définit la durée de vie de la session en secondes.
+Sets the session lifetime in seconds.
 
 ```go
 mqtt.WithSessionExpiryInterval(seconds uint32) Option
 ```
 
-- `0` - Session supprimée à la déconnexion
-- `0xFFFFFFFF` - Session permanente
+- `0` - Session deleted on disconnect
+- `0xFFFFFFFF` - Permanent session
 
-**Exemple:**
+**Example:**
 
 ```go
-mqtt.WithSessionExpiryInterval(3600) // 1 heure
+mqtt.WithSessionExpiryInterval(3600) // 1 hour
 ```
 
 ### WithReceiveMaximum
 
-Définit le nombre maximum de messages QoS 1/2 en vol.
+Sets the maximum number of QoS 1/2 messages in flight.
 
 ```go
 mqtt.WithReceiveMaximum(max uint16) Option
 ```
 
-**Défaut:** 65535
+**Default:** 65535
 
 ### WithMaxPacketSize
 
-Définit la taille maximum de paquet acceptée.
+Sets the maximum accepted packet size.
 
 ```go
 mqtt.WithMaxPacketSize(size uint32) Option
 ```
 
-**Défaut:** 256 MB
+**Default:** 256 MB
 
 ### WithTopicAliasMaximum
 
-Définit le nombre maximum de topic aliases.
+Sets the maximum number of topic aliases.
 
 ```go
 mqtt.WithTopicAliasMaximum(max uint16) Option
 ```
 
-**Défaut:** 0 (désactivé)
+**Default:** 0 (disabled)
 
 ### WithRequestResponseInfo
 
-Demande les informations de réponse au serveur.
+Requests response information from the server.
 
 ```go
 mqtt.WithRequestResponseInfo(enabled bool) Option
@@ -281,23 +281,23 @@ mqtt.WithRequestResponseInfo(enabled bool) Option
 
 ### WithRequestProblemInfo
 
-Demande les informations de problème au serveur.
+Requests problem information from the server.
 
 ```go
 mqtt.WithRequestProblemInfo(enabled bool) Option
 ```
 
-**Défaut:** true
+**Default:** true
 
 ### WithUserProperties
 
-Définit les propriétés utilisateur pour CONNECT.
+Sets user properties for CONNECT.
 
 ```go
 mqtt.WithUserProperties(props []UserProperty) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithUserProperties([]mqtt.UserProperty{
@@ -306,17 +306,17 @@ mqtt.WithUserProperties([]mqtt.UserProperty{
 })
 ```
 
-## Options Will Message
+## Will Message Options
 
 ### WithWill
 
-Configure le message Last Will and Testament.
+Configures the Last Will and Testament message.
 
 ```go
 mqtt.WithWill(topic string, payload []byte, qos QoS, retain bool) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithWill(
@@ -329,17 +329,17 @@ mqtt.WithWill(
 
 ### WithWillProperties
 
-Configure les propriétés du Will message.
+Configures Will message properties.
 
 ```go
 mqtt.WithWillProperties(props *Properties) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithWillProperties(&mqtt.Properties{
-    WillDelayInterval: ptrUint32(60), // Délai de 60 secondes
+    WillDelayInterval: ptrUint32(60), // 60 second delay
     MessageExpiry:     ptrUint32(3600),
     ContentType:       "application/json",
 })
@@ -349,7 +349,7 @@ mqtt.WithWillProperties(&mqtt.Properties{
 
 ### WithOnConnect
 
-Callback appelé après une connexion réussie.
+Callback called after successful connection.
 
 ```go
 mqtt.WithOnConnect(handler OnConnectHandler) Option
@@ -357,19 +357,19 @@ mqtt.WithOnConnect(handler OnConnectHandler) Option
 type OnConnectHandler func(client *Client)
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithOnConnect(func(c *mqtt.Client) {
-    log.Println("Connecté!")
-    // Resouscrire aux topics
+    log.Println("Connected!")
+    // Resubscribe to topics
     c.Subscribe(context.Background(), "my/topic", mqtt.QoS1, handler)
 })
 ```
 
 ### WithOnConnectionLost
 
-Callback appelé quand la connexion est perdue.
+Callback called when connection is lost.
 
 ```go
 mqtt.WithOnConnectionLost(handler ConnectionLostHandler) Option
@@ -377,17 +377,17 @@ mqtt.WithOnConnectionLost(handler ConnectionLostHandler) Option
 type ConnectionLostHandler func(client *Client, err error)
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithOnConnectionLost(func(c *mqtt.Client, err error) {
-    log.Printf("Connexion perdue: %v", err)
+    log.Printf("Connection lost: %v", err)
 })
 ```
 
 ### WithOnReconnecting
 
-Callback appelé avant chaque tentative de reconnexion.
+Callback called before each reconnection attempt.
 
 ```go
 mqtt.WithOnReconnecting(handler ReconnectHandler) Option
@@ -395,17 +395,17 @@ mqtt.WithOnReconnecting(handler ReconnectHandler) Option
 type ReconnectHandler func(client *Client, opts *ClientOptions)
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 mqtt.WithOnReconnecting(func(c *mqtt.Client, opts *mqtt.ClientOptions) {
-    log.Println("Tentative de reconnexion...")
+    log.Println("Attempting to reconnect...")
 })
 ```
 
 ### WithDefaultMessageHandler
 
-Handler par défaut pour les messages sans handler spécifique.
+Default handler for messages without a specific handler.
 
 ```go
 mqtt.WithDefaultMessageHandler(handler MessageHandler) Option
@@ -413,17 +413,17 @@ mqtt.WithDefaultMessageHandler(handler MessageHandler) Option
 type MessageHandler func(client *Client, msg *Message)
 ```
 
-## Options de logging
+## Logging Options
 
 ### WithLogger
 
-Configure le logger.
+Configures the logger.
 
 ```go
 mqtt.WithLogger(logger *slog.Logger) Option
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
@@ -433,11 +433,11 @@ logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 mqtt.WithLogger(logger)
 ```
 
-## Exemple complet
+## Complete Example
 
 ```go
 client := mqtt.NewClient(
-    // Connexion
+    // Connection
     mqtt.WithServer("mqtts://broker.example.com:8883"),
     mqtt.WithClientID("my-iot-device"),
     mqtt.WithCredentials("device", "secret"),
@@ -452,7 +452,7 @@ client := mqtt.NewClient(
     mqtt.WithSessionExpiryInterval(86400), // 24h
     mqtt.WithKeepAlive(30*time.Second),
 
-    // Reconnexion
+    // Reconnection
     mqtt.WithAutoReconnect(true),
     mqtt.WithConnectRetryInterval(time.Second),
     mqtt.WithMaxReconnectInterval(time.Minute),
@@ -469,10 +469,10 @@ client := mqtt.NewClient(
 
     // Callbacks
     mqtt.WithOnConnect(func(c *mqtt.Client) {
-        log.Println("Connecté")
+        log.Println("Connected")
     }),
     mqtt.WithOnConnectionLost(func(c *mqtt.Client, err error) {
-        log.Printf("Déconnecté: %v", err)
+        log.Printf("Disconnected: %v", err)
     }),
 
     // Logging

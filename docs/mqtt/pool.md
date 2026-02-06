@@ -1,26 +1,26 @@
 # Connection Pooling
 
-Documentation du pool de connexions MQTT pour applications haute performance.
+MQTT connection pool documentation for high-performance applications.
 
-## Vue d'ensemble
+## Overview
 
-Le pool de connexions maintient plusieurs connexions MQTT actives et les distribue via round-robin. Cela permet:
+The connection pool maintains multiple active MQTT connections and distributes them via round-robin. This enables:
 
-- **Haute disponibilité** - Failover automatique si une connexion échoue
-- **Haute performance** - Distribution de charge entre connexions
-- **Résilience** - Health checks et reconnexion automatique
+- **High Availability** - Automatic failover if a connection fails
+- **High Performance** - Load distribution across connections
+- **Resilience** - Health checks and automatic reconnection
 
-## Création du pool
+## Pool Creation
 
 ### NewPool
 
-Crée un nouveau pool de connexions.
+Creates a new connection pool.
 
 ```go
 func NewPool(opts ...PoolOption) *Pool
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 pool := mqtt.NewPool(
@@ -33,72 +33,72 @@ pool := mqtt.NewPool(
 )
 ```
 
-## Options du pool
+## Pool Options
 
 ### WithPoolSize
 
-Définit le nombre de connexions dans le pool.
+Sets the number of connections in the pool.
 
 ```go
 mqtt.WithPoolSize(size int) PoolOption
 ```
 
-**Défaut:** 3
+**Default:** 3
 
 ### WithPoolMaxIdleTime
 
-Définit la durée maximum d'inactivité d'une connexion.
+Sets the maximum idle time for a connection.
 
 ```go
 mqtt.WithPoolMaxIdleTime(d time.Duration) PoolOption
 ```
 
-**Défaut:** 5 minutes
+**Default:** 5 minutes
 
 ### WithPoolHealthCheckInterval
 
-Définit l'intervalle des health checks.
+Sets the health check interval.
 
 ```go
 mqtt.WithPoolHealthCheckInterval(d time.Duration) PoolOption
 ```
 
-**Défaut:** 30 secondes
+**Default:** 30 seconds
 
 ### WithPoolClientOptions
 
-Définit les options pour chaque client du pool.
+Sets the options for each client in the pool.
 
 ```go
 mqtt.WithPoolClientOptions(opts ...Option) PoolOption
 ```
 
-## Méthodes
+## Methods
 
 ### Connect
 
-Initialise toutes les connexions du pool.
+Initializes all connections in the pool.
 
 ```go
 func (p *Pool) Connect(ctx context.Context) error
 ```
 
-**Retourne:** `nil` si au moins une connexion réussit, sinon la première erreur.
+**Returns:** `nil` if at least one connection succeeds, otherwise the first error.
 
-**Exemple:**
+**Example:**
 
 ```go
 ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 defer cancel()
 
 if err := pool.Connect(ctx); err != nil {
-    log.Fatalf("Échec de connexion du pool: %v", err)
+    log.Fatalf("Pool connection failed: %v", err)
 }
 ```
 
 ### Close
 
-Ferme toutes les connexions du pool.
+Closes all connections in the pool.
 
 ```go
 func (p *Pool) Close() error
@@ -106,32 +106,32 @@ func (p *Pool) Close() error
 
 ### Get
 
-Obtient un client du pool (round-robin).
+Gets a client from the pool (round-robin).
 
 ```go
 func (p *Pool) Get() (*Client, error)
 ```
 
-**Retourne:**
-- `*Client` - Client MQTT disponible
-- `error` - Si aucune connexion n'est disponible
+**Returns:**
+- `*Client` - Available MQTT client
+- `error` - If no connection is available
 
-**Exemple:**
+**Example:**
 
 ```go
 client, err := pool.Get()
 if err != nil {
-    log.Printf("Aucune connexion disponible: %v", err)
+    log.Printf("No connection available: %v", err)
     return
 }
 defer pool.Release(client)
 
-// Utiliser le client...
+// Use the client...
 ```
 
 ### Release
 
-Retourne un client au pool.
+Returns a client to the pool.
 
 ```go
 func (p *Pool) Release(client *Client)
@@ -139,33 +139,33 @@ func (p *Pool) Release(client *Client)
 
 ### Publish
 
-Publie un message via une connexion du pool.
+Publishes a message via a pool connection.
 
 ```go
 func (p *Pool) Publish(ctx context.Context, topic string, payload []byte, qos QoS, retain bool) error
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 if err := pool.Publish(ctx, "sensors/data", payload, mqtt.QoS1, false); err != nil {
-    log.Printf("Échec de publication: %v", err)
+    log.Printf("Publish failed: %v", err)
 }
 ```
 
 ### Subscribe
 
-Souscrit via une connexion du pool.
+Subscribes via a pool connection.
 
 ```go
 func (p *Pool) Subscribe(ctx context.Context, topic string, qos QoS, handler MessageHandler) error
 ```
 
-## Métriques du pool
+## Pool Metrics
 
 ### Metrics
 
-Retourne les métriques du pool.
+Returns pool metrics.
 
 ```go
 func (p *Pool) Metrics() *PoolMetrics
@@ -173,16 +173,16 @@ func (p *Pool) Metrics() *PoolMetrics
 
 ```go
 type PoolMetrics struct {
-    TotalClients   Gauge    // Nombre total de clients
-    HealthyClients Gauge    // Nombre de clients sains
-    TotalRequests  Counter  // Total des requêtes
-    FailedRequests Counter  // Requêtes échouées
+    TotalClients   Gauge    // Total number of clients
+    HealthyClients Gauge    // Number of healthy clients
+    TotalRequests  Counter  // Total requests
+    FailedRequests Counter  // Failed requests
 }
 ```
 
 ### Size
 
-Retourne la taille du pool.
+Returns the pool size.
 
 ```go
 func (p *Pool) Size() int
@@ -190,15 +190,15 @@ func (p *Pool) Size() int
 
 ### HealthyCount
 
-Retourne le nombre de connexions saines.
+Returns the number of healthy connections.
 
 ```go
 func (p *Pool) HealthyCount() int
 ```
 
-## Exemple complet
+## Complete Example
 
-### Application haute performance
+### High-Performance Application
 
 ```go
 package main
@@ -206,6 +206,7 @@ package main
 import (
     "context"
     "encoding/json"
+    "fmt"
     "log"
     "os"
     "os/signal"
@@ -222,7 +223,7 @@ type SensorReading struct {
 }
 
 func main() {
-    // Créer le pool
+    // Create the pool
     pool := mqtt.NewPool(
         mqtt.WithPoolSize(10),
         mqtt.WithPoolHealthCheckInterval(15*time.Second),
@@ -235,21 +236,21 @@ func main() {
         ),
     )
 
-    // Connexion
+    // Connect
     ctx := context.Background()
     if err := pool.Connect(ctx); err != nil {
-        log.Fatalf("Échec de connexion: %v", err)
+        log.Fatalf("Connection failed: %v", err)
     }
     defer pool.Close()
 
-    log.Printf("Pool connecté: %d/%d connexions saines",
+    log.Printf("Pool connected: %d/%d healthy connections",
         pool.HealthyCount(), pool.Size())
 
-    // Simuler des capteurs envoyant des données
+    // Simulate sensors sending data
     var wg sync.WaitGroup
     done := make(chan struct{})
 
-    // 100 capteurs simulés
+    // 100 simulated sensors
     for i := 0; i < 100; i++ {
         wg.Add(1)
         go func(sensorID int) {
@@ -272,14 +273,14 @@ func main() {
                     topic := fmt.Sprintf("sensors/%s/data", reading.SensorID)
 
                     if err := pool.Publish(ctx, topic, payload, mqtt.QoS0, false); err != nil {
-                        log.Printf("Erreur publication %s: %v", reading.SensorID, err)
+                        log.Printf("Publish error %s: %v", reading.SensorID, err)
                     }
                 }
             }
         }(i)
     }
 
-    // Afficher les métriques périodiquement
+    // Display metrics periodically
     go func() {
         ticker := time.NewTicker(5 * time.Second)
         defer ticker.Stop()
@@ -300,18 +301,18 @@ func main() {
         }
     }()
 
-    // Attendre le signal d'arrêt
+    // Wait for shutdown signal
     sigCh := make(chan os.Signal, 1)
     signal.Notify(sigCh, os.Interrupt)
     <-sigCh
 
-    log.Println("Arrêt...")
+    log.Println("Shutting down...")
     close(done)
     wg.Wait()
 }
 ```
 
-### Load balancing avec handlers différents
+### Load Balancing with Different Handlers
 
 ```go
 package main
@@ -338,19 +339,19 @@ func main() {
     }
     defer pool.Close()
 
-    // Créer des handlers spécialisés sur différentes connexions
+    // Create specialized handlers on different connections
     var wg sync.WaitGroup
 
-    // Handler pour les données de température
+    // Temperature data handler
     wg.Add(1)
     go func() {
         defer wg.Done()
         client, err := pool.Get()
         if err != nil {
-            log.Printf("Erreur get: %v", err)
+            log.Printf("Get error: %v", err)
             return
         }
-        // Note: Ne pas Release si on garde le client pour les subscriptions
+        // Note: Don't Release if keeping the client for subscriptions
 
         handler := func(c *mqtt.Client, msg *mqtt.Message) {
             log.Printf("Temperature: %s", string(msg.Payload))
@@ -358,13 +359,13 @@ func main() {
         client.Subscribe(ctx, "sensors/+/temperature", mqtt.QoS1, handler)
     }()
 
-    // Handler pour les données d'humidité
+    // Humidity data handler
     wg.Add(1)
     go func() {
         defer wg.Done()
         client, err := pool.Get()
         if err != nil {
-            log.Printf("Erreur get: %v", err)
+            log.Printf("Get error: %v", err)
             return
         }
 
@@ -375,21 +376,21 @@ func main() {
     }()
 
     wg.Wait()
-    select {} // Bloquer
+    select {} // Block
 }
 ```
 
-## Bonnes pratiques
+## Best Practices
 
-### 1. Dimensionnement du pool
+### 1. Pool Sizing
 
 ```go
-// Règle générale: 1 connexion pour 1000 messages/sec
-// Ajuster selon la latence réseau et la QoS utilisée
+// General rule: 1 connection per 1000 messages/sec
+// Adjust based on network latency and QoS used
 mqtt.WithPoolSize(numWorkers / 100)
 ```
 
-### 2. Gestion des erreurs
+### 2. Error Handling
 
 ```go
 func publishWithRetry(pool *mqtt.Pool, topic string, payload []byte) error {
@@ -409,7 +410,7 @@ func publishWithRetry(pool *mqtt.Pool, topic string, payload []byte) error {
 ### 3. Monitoring
 
 ```go
-// Surveiller la santé du pool
+// Monitor pool health
 go func() {
     ticker := time.NewTicker(time.Minute)
     for range ticker.C {
@@ -417,25 +418,25 @@ go func() {
         total := pool.Size()
 
         if healthy < total/2 {
-            log.Warnf("Pool dégradé: %d/%d connexions", healthy, total)
-            // Alerter...
+            log.Warnf("Pool degraded: %d/%d connections", healthy, total)
+            // Alert...
         }
     }
 }()
 ```
 
-### 4. Graceful shutdown
+### 4. Graceful Shutdown
 
 ```go
 func shutdown(pool *mqtt.Pool) {
     ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
     defer cancel()
 
-    // Attendre que les publications en cours se terminent
+    // Wait for in-flight publications to complete
     // ...
 
     if err := pool.Close(); err != nil {
-        log.Printf("Erreur fermeture pool: %v", err)
+        log.Printf("Pool close error: %v", err)
     }
 }
 ```

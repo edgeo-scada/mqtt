@@ -1,36 +1,36 @@
 # MQTT Client Library
 
-Bibliothèque client MQTT 5.0 en Go pur avec support TLS, WebSocket et connection pooling.
+Pure Go MQTT 5.0 client library with TLS, WebSocket, and connection pooling support.
 
-## Vue d'ensemble
+## Overview
 
-Cette bibliothèque fournit une implémentation complète du protocole MQTT 5.0 pour Go, conçue pour les applications industrielles et IoT nécessitant une communication fiable et performante.
+This library provides a complete implementation of the MQTT 5.0 protocol for Go, designed for industrial and IoT applications requiring reliable and high-performance communication.
 
-## Fonctionnalités
+## Features
 
-### Protocole MQTT 5.0
-- Support complet des propriétés MQTT 5.0
-- Codes de raison détaillés pour le diagnostic
-- Topic aliases pour réduire la bande passante
-- Session expiry et message expiry
-- Request/Response pattern natif
+### MQTT 5.0 Protocol
+- Full MQTT 5.0 property support
+- Detailed reason codes for diagnostics
+- Topic aliases to reduce bandwidth
+- Session expiry and message expiry
+- Native Request/Response pattern
 
 ### Transports
-- **TCP** - Connexion standard sur port 1883
-- **TLS/SSL** - Connexion sécurisée sur port 8883
-- **WebSocket** - Pour environnements avec proxy HTTP
-- **WebSocket Secure** - WebSocket sur TLS
+- **TCP** - Standard connection on port 1883
+- **TLS/SSL** - Secure connection on port 8883
+- **WebSocket** - For environments with HTTP proxies
+- **WebSocket Secure** - WebSocket over TLS
 
-### Qualité de Service
+### Quality of Service
 - **QoS 0** - At most once (fire and forget)
 - **QoS 1** - At least once (acknowledged delivery)
 - **QoS 2** - Exactly once (assured delivery)
 
-### Fonctionnalités avancées
-- Reconnexion automatique avec backoff exponentiel
-- Connection pooling pour haute performance
-- Métriques intégrées
-- Wildcards topics (`+` et `#`)
+### Advanced Features
+- Automatic reconnection with exponential backoff
+- Connection pooling for high performance
+- Built-in metrics
+- Topic wildcards (`+` and `#`)
 - Will messages (Last Will and Testament)
 
 ## Installation
@@ -39,7 +39,7 @@ Cette bibliothèque fournit une implémentation complète du protocole MQTT 5.0 
 go get github.com/edgeo-scada/mqtt
 ```
 
-## Exemple rapide
+## Quick Example
 
 ```go
 package main
@@ -52,19 +52,19 @@ import (
 )
 
 func main() {
-    // Créer le client
+    // Create the client
     client := mqtt.NewClient(
         mqtt.WithServer("mqtt://localhost:1883"),
         mqtt.WithClientID("my-app"),
     )
 
-    // Connexion
+    // Connect
     if err := client.Connect(context.Background()); err != nil {
         log.Fatal(err)
     }
     defer client.Disconnect(context.Background())
 
-    // Publier un message
+    // Publish a message
     token := client.Publish(context.Background(),
         "sensors/temperature",
         []byte("22.5"),
@@ -81,43 +81,43 @@ func main() {
 
 | Document | Description |
 |----------|-------------|
-| [Getting Started](getting-started.md) | Guide de démarrage rapide |
-| [Client](client.md) | API du client MQTT |
-| [Options](options.md) | Configuration et options |
+| [Getting Started](getting-started.md) | Quick start guide |
+| [Client](client.md) | MQTT client API |
+| [Options](options.md) | Configuration and options |
 | [Pool](pool.md) | Connection pooling |
-| [Errors](errors.md) | Gestion des erreurs |
-| [Metrics](metrics.md) | Métriques et monitoring |
-| [CLI](cli.md) | Outil en ligne de commande edgeo-mqtt |
-| [Changelog](changelog.md) | Historique des versions |
+| [Errors](errors.md) | Error handling |
+| [Metrics](metrics.md) | Metrics and monitoring |
+| [CLI](cli.md) | edgeo-mqtt command-line tool |
+| [Changelog](changelog.md) | Version history |
 
-## Exemples
+## Examples
 
-| Exemple | Description |
+| Example | Description |
 |---------|-------------|
-| [Publisher](examples/publisher.md) | Publication de messages |
-| [Subscriber](examples/subscriber.md) | Souscription aux topics |
+| [Publisher](examples/publisher.md) | Message publishing |
+| [Subscriber](examples/subscriber.md) | Topic subscription |
 
 ## Architecture
 
 ```
 mqtt/
-├── client.go      # Client MQTT principal
-├── types.go       # Types et constantes
-├── protocol.go    # Encodage/décodage protocole
-├── packets.go     # Packets MQTT
-├── options.go     # Options de configuration
+├── client.go      # Main MQTT client
+├── types.go       # Types and constants
+├── protocol.go    # Protocol encoding/decoding
+├── packets.go     # MQTT packets
+├── options.go     # Configuration options
 ├── pool.go        # Connection pooling
-├── metrics.go     # Métriques
-├── errors.go      # Gestion des erreurs
-└── version.go     # Information de version
+├── metrics.go     # Metrics
+├── errors.go      # Error handling
+└── version.go     # Version information
 ```
 
-## Compatibilité
+## Compatibility
 
 - Go 1.22+
 - MQTT 5.0
-- Brokers testés : Mosquitto, HiveMQ, EMQX, VerneMQ
+- Tested brokers: Mosquitto, HiveMQ, EMQX, VerneMQ
 
-## Licence
+## License
 
 MIT License

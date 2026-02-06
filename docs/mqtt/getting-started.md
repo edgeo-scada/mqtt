@@ -1,11 +1,11 @@
 # Getting Started
 
-Guide de démarrage rapide pour la bibliothèque MQTT.
+Quick start guide for the MQTT library.
 
-## Prérequis
+## Prerequisites
 
-- Go 1.22 ou supérieur
-- Un broker MQTT (Mosquitto, HiveMQ, EMQX, etc.)
+- Go 1.22 or higher
+- An MQTT broker (Mosquitto, HiveMQ, EMQX, etc.)
 
 ## Installation
 
@@ -13,9 +13,9 @@ Guide de démarrage rapide pour la bibliothèque MQTT.
 go get github.com/edgeo-scada/mqtt
 ```
 
-## Premier client
+## First Client
 
-### Publisher simple
+### Simple Publisher
 
 ```go
 package main
@@ -29,38 +29,38 @@ import (
 )
 
 func main() {
-    // Créer le client avec les options de base
+    // Create the client with basic options
     client := mqtt.NewClient(
         mqtt.WithServer("mqtt://localhost:1883"),
         mqtt.WithClientID("my-publisher"),
         mqtt.WithCleanStart(true),
     )
 
-    // Connexion au broker
+    // Connect to the broker
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
     if err := client.Connect(ctx); err != nil {
-        log.Fatalf("Échec de connexion: %v", err)
+        log.Fatalf("Connection failed: %v", err)
     }
     defer client.Disconnect(context.Background())
 
-    log.Println("Connecté au broker MQTT")
+    log.Println("Connected to MQTT broker")
 
-    // Publier un message
+    // Publish a message
     topic := "test/hello"
     payload := []byte("Hello MQTT!")
 
     token := client.Publish(context.Background(), topic, payload, mqtt.QoS1, false)
     if err := token.Wait(); err != nil {
-        log.Fatalf("Échec de publication: %v", err)
+        log.Fatalf("Publish failed: %v", err)
     }
 
-    log.Printf("Message publié sur %s", topic)
+    log.Printf("Message published to %s", topic)
 }
 ```
 
-### Subscriber simple
+### Simple Subscriber
 
 ```go
 package main
@@ -76,44 +76,44 @@ import (
 )
 
 func main() {
-    // Handler pour les messages reçus
+    // Handler for received messages
     handler := func(c *mqtt.Client, msg *mqtt.Message) {
-        log.Printf("Message reçu sur %s: %s", msg.Topic, string(msg.Payload))
+        log.Printf("Message received on %s: %s", msg.Topic, string(msg.Payload))
     }
 
-    // Créer le client
+    // Create the client
     client := mqtt.NewClient(
         mqtt.WithServer("mqtt://localhost:1883"),
         mqtt.WithClientID("my-subscriber"),
         mqtt.WithDefaultMessageHandler(handler),
     )
 
-    // Connexion
+    // Connect
     ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
     defer cancel()
 
     if err := client.Connect(ctx); err != nil {
-        log.Fatalf("Échec de connexion: %v", err)
+        log.Fatalf("Connection failed: %v", err)
     }
     defer client.Disconnect(context.Background())
 
-    // Souscrire au topic
+    // Subscribe to the topic
     token := client.Subscribe(context.Background(), "test/#", mqtt.QoS1, handler)
     if err := token.Wait(); err != nil {
-        log.Fatalf("Échec de souscription: %v", err)
+        log.Fatalf("Subscribe failed: %v", err)
     }
-    log.Println("Souscrit à test/#")
+    log.Println("Subscribed to test/#")
 
-    // Attendre le signal d'arrêt
+    // Wait for shutdown signal
     sigCh := make(chan os.Signal, 1)
     signal.Notify(sigCh, os.Interrupt)
     <-sigCh
 
-    log.Println("Arrêt...")
+    log.Println("Shutting down...")
 }
 ```
 
-## Connexion sécurisée (TLS)
+## Secure Connection (TLS)
 
 ```go
 import "crypto/tls"
@@ -122,12 +122,12 @@ client := mqtt.NewClient(
     mqtt.WithServer("mqtts://broker.example.com:8883"),
     mqtt.WithClientID("secure-client"),
     mqtt.WithTLS(&tls.Config{
-        // Configuration TLS personnalisée si nécessaire
+        // Custom TLS configuration if needed
     }),
 )
 ```
 
-Pour les tests sans vérification de certificat :
+For testing without certificate verification:
 
 ```go
 client := mqtt.NewClient(
@@ -136,23 +136,23 @@ client := mqtt.NewClient(
 )
 ```
 
-## Connexion WebSocket
+## WebSocket Connection
 
 ```go
-// WebSocket standard
+// Standard WebSocket
 client := mqtt.NewClient(
     mqtt.WithServer("ws://broker.example.com:80"),
     mqtt.WithWebSocketPath("/mqtt"),
 )
 
-// WebSocket sécurisé
+// Secure WebSocket
 client := mqtt.NewClient(
     mqtt.WithServer("wss://broker.example.com:443"),
     mqtt.WithWebSocketPath("/mqtt"),
 )
 ```
 
-## Authentification
+## Authentication
 
 ### Username/Password
 
@@ -163,7 +163,7 @@ client := mqtt.NewClient(
 )
 ```
 
-### Certificat client (mTLS)
+### Client Certificate (mTLS)
 
 ```go
 cert, err := tls.LoadX509KeyPair("client.crt", "client.key")
@@ -179,11 +179,11 @@ client := mqtt.NewClient(
 )
 ```
 
-## Niveaux de QoS
+## QoS Levels
 
 ### QoS 0 - At most once
 
-Message envoyé une seule fois, sans confirmation. Peut être perdu.
+Message sent once without confirmation. May be lost.
 
 ```go
 client.Publish(ctx, "topic", payload, mqtt.QoS0, false)
@@ -191,23 +191,23 @@ client.Publish(ctx, "topic", payload, mqtt.QoS0, false)
 
 ### QoS 1 - At least once
 
-Message confirmé par PUBACK. Peut être dupliqué.
+Message confirmed by PUBACK. May be duplicated.
 
 ```go
 token := client.Publish(ctx, "topic", payload, mqtt.QoS1, false)
 if err := token.Wait(); err != nil {
-    log.Printf("Erreur: %v", err)
+    log.Printf("Error: %v", err)
 }
 ```
 
 ### QoS 2 - Exactly once
 
-Livraison garantie exactement une fois (PUBREC/PUBREL/PUBCOMP).
+Guaranteed exactly-once delivery (PUBREC/PUBREL/PUBCOMP).
 
 ```go
 token := client.Publish(ctx, "topic", payload, mqtt.QoS2, false)
 if err := token.Wait(); err != nil {
-    log.Printf("Erreur: %v", err)
+    log.Printf("Error: %v", err)
 }
 ```
 
@@ -215,25 +215,25 @@ if err := token.Wait(); err != nil {
 
 ### Single-level wildcard (+)
 
-Correspond à un seul niveau de topic.
+Matches a single topic level.
 
 ```go
-// Souscrit à sensors/room1/temperature, sensors/room2/temperature, etc.
+// Subscribes to sensors/room1/temperature, sensors/room2/temperature, etc.
 client.Subscribe(ctx, "sensors/+/temperature", mqtt.QoS1, handler)
 ```
 
 ### Multi-level wildcard (#)
 
-Correspond à tous les niveaux restants.
+Matches all remaining levels.
 
 ```go
-// Souscrit à tous les topics sous sensors/
+// Subscribes to all topics under sensors/
 client.Subscribe(ctx, "sensors/#", mqtt.QoS1, handler)
 ```
 
 ## Will Message (Last Will and Testament)
 
-Configure un message envoyé automatiquement si le client se déconnecte de façon inattendue.
+Configures a message automatically sent if the client disconnects unexpectedly.
 
 ```go
 client := mqtt.NewClient(
@@ -248,9 +248,9 @@ client := mqtt.NewClient(
 )
 ```
 
-## Reconnexion automatique
+## Automatic Reconnection
 
-Par défaut, le client se reconnecte automatiquement avec backoff exponentiel.
+By default, the client automatically reconnects with exponential backoff.
 
 ```go
 client := mqtt.NewClient(
@@ -258,16 +258,16 @@ client := mqtt.NewClient(
     mqtt.WithAutoReconnect(true),
     mqtt.WithConnectRetryInterval(1*time.Second),
     mqtt.WithMaxReconnectInterval(2*time.Minute),
-    mqtt.WithMaxRetries(0), // 0 = illimité
+    mqtt.WithMaxRetries(0), // 0 = unlimited
     mqtt.WithOnReconnecting(func(c *mqtt.Client, opts *mqtt.ClientOptions) {
-        log.Println("Tentative de reconnexion...")
+        log.Println("Attempting to reconnect...")
     }),
 )
 ```
 
-## Prochaines étapes
+## Next Steps
 
-- [Client API](client.md) - Documentation complète de l'API client
-- [Options](options.md) - Toutes les options de configuration
-- [Pool](pool.md) - Connection pooling pour haute performance
-- [Metrics](metrics.md) - Monitoring et métriques
+- [Client API](client.md) - Complete client API documentation
+- [Options](options.md) - All configuration options
+- [Pool](pool.md) - Connection pooling for high performance
+- [Metrics](metrics.md) - Monitoring and metrics

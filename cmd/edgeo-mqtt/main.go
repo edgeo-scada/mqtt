@@ -1,4 +1,3 @@
-// edgeo-mqtt is a command-line MQTT client for testing, debugging, and benchmarking.
 package main
 
 import (

@@ -1,18 +1,18 @@
 # Client API
 
-Documentation complète de l'API du client MQTT.
+Complete documentation of the MQTT client API.
 
-## Création du client
+## Client Creation
 
 ### NewClient
 
-Crée une nouvelle instance du client MQTT.
+Creates a new MQTT client instance.
 
 ```go
 func NewClient(opts ...Option) *Client
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 client := mqtt.NewClient(
@@ -22,92 +22,92 @@ client := mqtt.NewClient(
 )
 ```
 
-## Méthodes de connexion
+## Connection Methods
 
 ### Connect
 
-Établit une connexion au broker MQTT.
+Establishes a connection to the MQTT broker.
 
 ```go
 func (c *Client) Connect(ctx context.Context) error
 ```
 
-**Paramètres:**
-- `ctx` - Context pour annulation et timeout
+**Parameters:**
+- `ctx` - Context for cancellation and timeout
 
-**Retour:**
-- `error` - Erreur de connexion ou nil
+**Returns:**
+- `error` - Connection error or nil
 
-**Exemple:**
+**Example:**
 
 ```go
 ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 defer cancel()
 
 if err := client.Connect(ctx); err != nil {
-    log.Fatalf("Connexion échouée: %v", err)
+    log.Fatalf("Connection failed: %v", err)
 }
 ```
 
 ### Disconnect
 
-Ferme proprement la connexion au broker.
+Gracefully closes the connection to the broker.
 
 ```go
 func (c *Client) Disconnect(ctx context.Context) error
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 if err := client.Disconnect(context.Background()); err != nil {
-    log.Printf("Erreur lors de la déconnexion: %v", err)
+    log.Printf("Error during disconnect: %v", err)
 }
 ```
 
-## Publication
+## Publishing
 
 ### Publish
 
-Publie un message sur un topic.
+Publishes a message to a topic.
 
 ```go
 func (c *Client) Publish(ctx context.Context, topic string, payload []byte, qos QoS, retain bool) *PublishToken
 ```
 
-**Paramètres:**
-- `ctx` - Context pour annulation
-- `topic` - Topic de destination
-- `payload` - Contenu du message
-- `qos` - Niveau de QoS (0, 1, ou 2)
-- `retain` - Si true, le message est retenu par le broker
+**Parameters:**
+- `ctx` - Context for cancellation
+- `topic` - Destination topic
+- `payload` - Message content
+- `qos` - QoS level (0, 1, or 2)
+- `retain` - If true, message is retained by the broker
 
-**Retour:**
-- `*PublishToken` - Token pour suivre l'opération asynchrone
+**Returns:**
+- `*PublishToken` - Token to track the asynchronous operation
 
-**Exemple:**
+**Example:**
 
 ```go
 token := client.Publish(ctx, "sensors/temp", []byte("22.5"), mqtt.QoS1, false)
 if err := token.Wait(); err != nil {
-    log.Printf("Erreur de publication: %v", err)
+    log.Printf("Publish error: %v", err)
 }
 ```
 
 ### PublishWithProperties
 
-Publie un message avec des propriétés MQTT 5.0.
+Publishes a message with MQTT 5.0 properties.
 
 ```go
 func (c *Client) PublishWithProperties(ctx context.Context, topic string, payload []byte, qos QoS, retain bool, props *Properties) *PublishToken
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 props := &mqtt.Properties{
     ContentType:     "application/json",
-    MessageExpiry:   ptrUint32(3600), // Expire après 1 heure
+    MessageExpiry:   ptrUint32(3600), // Expires after 1 hour
     ResponseTopic:   "response/topic",
     CorrelationData: []byte("request-123"),
     UserProperties: []mqtt.UserProperty{
@@ -118,47 +118,47 @@ props := &mqtt.Properties{
 token := client.PublishWithProperties(ctx, "requests/data", payload, mqtt.QoS1, false, props)
 ```
 
-## Souscription
+## Subscription
 
 ### Subscribe
 
-Souscrit à un topic avec un handler.
+Subscribes to a topic with a handler.
 
 ```go
 func (c *Client) Subscribe(ctx context.Context, topic string, qos QoS, handler MessageHandler) *SubscribeToken
 ```
 
-**Paramètres:**
-- `ctx` - Context pour annulation
-- `topic` - Filtre de topic (peut contenir wildcards)
-- `qos` - QoS maximum demandé
-- `handler` - Fonction appelée pour chaque message
+**Parameters:**
+- `ctx` - Context for cancellation
+- `topic` - Topic filter (may contain wildcards)
+- `qos` - Maximum QoS requested
+- `handler` - Function called for each message
 
-**Exemple:**
+**Example:**
 
 ```go
 handler := func(c *mqtt.Client, msg *mqtt.Message) {
-    log.Printf("Reçu sur %s: %s", msg.Topic, string(msg.Payload))
+    log.Printf("Received on %s: %s", msg.Topic, string(msg.Payload))
 }
 
 token := client.Subscribe(ctx, "sensors/#", mqtt.QoS1, handler)
 if err := token.Wait(); err != nil {
-    log.Printf("Erreur de souscription: %v", err)
+    log.Printf("Subscribe error: %v", err)
 }
 
-// Vérifier le QoS accordé
-log.Printf("QoS accordé: %v", token.GrantedQoS)
+// Check granted QoS
+log.Printf("Granted QoS: %v", token.GrantedQoS)
 ```
 
 ### SubscribeMultiple
 
-Souscrit à plusieurs topics en une seule requête.
+Subscribes to multiple topics in a single request.
 
 ```go
 func (c *Client) SubscribeMultiple(ctx context.Context, subs []Subscription, handler MessageHandler) *SubscribeToken
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 subs := []mqtt.Subscription{
@@ -169,32 +169,32 @@ subs := []mqtt.Subscription{
 
 token := client.SubscribeMultiple(ctx, subs, handler)
 if err := token.Wait(); err != nil {
-    log.Printf("Erreur: %v", err)
+    log.Printf("Error: %v", err)
 }
 ```
 
 ### Unsubscribe
 
-Se désabonne d'un ou plusieurs topics.
+Unsubscribes from one or more topics.
 
 ```go
 func (c *Client) Unsubscribe(ctx context.Context, topics ...string) *UnsubscribeToken
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 token := client.Unsubscribe(ctx, "sensors/temperature", "sensors/humidity")
 if err := token.Wait(); err != nil {
-    log.Printf("Erreur: %v", err)
+    log.Printf("Error: %v", err)
 }
 ```
 
-## État de la connexion
+## Connection State
 
 ### IsConnected
 
-Vérifie si le client est connecté.
+Checks if the client is connected.
 
 ```go
 func (c *Client) IsConnected() bool
@@ -202,82 +202,82 @@ func (c *Client) IsConnected() bool
 
 ### State
 
-Retourne l'état actuel de la connexion.
+Returns the current connection state.
 
 ```go
 func (c *Client) State() ConnectionState
 ```
 
-**États possibles:**
-- `StateDisconnected` - Non connecté
-- `StateConnecting` - Connexion en cours
-- `StateConnected` - Connecté
-- `StateDisconnecting` - Déconnexion en cours
+**Possible states:**
+- `StateDisconnected` - Not connected
+- `StateConnecting` - Connection in progress
+- `StateConnected` - Connected
+- `StateDisconnecting` - Disconnection in progress
 
-**Exemple:**
+**Example:**
 
 ```go
 switch client.State() {
 case mqtt.StateConnected:
-    log.Println("Client connecté")
+    log.Println("Client connected")
 case mqtt.StateConnecting:
-    log.Println("Connexion en cours...")
+    log.Println("Connection in progress...")
 case mqtt.StateDisconnected:
-    log.Println("Client déconnecté")
+    log.Println("Client disconnected")
 }
 ```
 
-## Propriétés serveur
+## Server Properties
 
 ### ServerProperties
 
-Retourne les propriétés envoyées par le serveur dans CONNACK.
+Returns properties sent by the server in CONNACK.
 
 ```go
 func (c *Client) ServerProperties() *Properties
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 props := client.ServerProperties()
 if props != nil {
     if props.MaximumQoS != nil {
-        log.Printf("QoS maximum supporté: %d", *props.MaximumQoS)
+        log.Printf("Maximum supported QoS: %d", *props.MaximumQoS)
     }
     if props.TopicAliasMaximum != nil {
         log.Printf("Topic alias max: %d", *props.TopicAliasMaximum)
     }
     if props.RetainAvailable != nil && *props.RetainAvailable == 0 {
-        log.Println("Retain non supporté par le broker")
+        log.Println("Retain not supported by broker")
     }
 }
 ```
 
-## Métriques
+## Metrics
 
 ### Metrics
 
-Retourne les métriques du client.
+Returns client metrics.
 
 ```go
 func (c *Client) Metrics() *Metrics
 ```
 
-**Exemple:**
+**Example:**
 
 ```go
 metrics := client.Metrics()
 snapshot := metrics.Snapshot()
 
-log.Printf("Messages envoyés: %d", snapshot.MessagesSent)
-log.Printf("Messages reçus: %d", snapshot.MessagesReceived)
-log.Printf("Reconnexions: %d", snapshot.ReconnectAttempts)
+log.Printf("Messages sent: %d", snapshot.MessagesSent)
+log.Printf("Messages received: %d", snapshot.MessagesReceived)
+log.Printf("Reconnect attempts: %d", snapshot.ReconnectAttempts)
 ```
 
 ## Tokens
 
-Les opérations asynchrones retournent des tokens pour suivre leur état.
+Asynchronous operations return tokens to track their state.
 
 ### Token interface
 
@@ -290,20 +290,20 @@ type Token interface {
 }
 ```
 
-### Attente avec timeout
+### Waiting with timeout
 
 ```go
 token := client.Publish(ctx, topic, payload, mqtt.QoS1, false)
 if err := token.WaitTimeout(5 * time.Second); err != nil {
     if err == mqtt.ErrTimeout {
-        log.Println("Publication timeout")
+        log.Println("Publish timeout")
     } else {
-        log.Printf("Erreur: %v", err)
+        log.Printf("Error: %v", err)
     }
 }
 ```
 
-### Utilisation avec select
+### Using with select
 
 ```go
 token := client.Subscribe(ctx, topic, mqtt.QoS1, handler)
@@ -311,14 +311,14 @@ token := client.Subscribe(ctx, topic, mqtt.QoS1, handler)
 select {
 case <-token.Done():
     if err := token.Error(); err != nil {
-        log.Printf("Erreur: %v", err)
+        log.Printf("Error: %v", err)
     } else {
-        log.Println("Souscription réussie")
+        log.Println("Subscribe successful")
     }
 case <-time.After(10 * time.Second):
     log.Println("Timeout")
 case <-ctx.Done():
-    log.Println("Annulé")
+    log.Println("Cancelled")
 }
 ```
 
@@ -326,23 +326,23 @@ case <-ctx.Done():
 
 ### Message
 
-Structure représentant un message reçu.
+Structure representing a received message.
 
 ```go
 type Message struct {
-    Topic      string       // Topic du message
-    Payload    []byte       // Contenu du message
-    QoS        QoS          // Niveau de QoS
-    Retain     bool         // Flag retain
-    PacketID   uint16       // ID du paquet (QoS > 0)
-    Properties *Properties  // Propriétés MQTT 5.0
-    Duplicate  bool         // Flag de duplication
+    Topic      string       // Message topic
+    Payload    []byte       // Message content
+    QoS        QoS          // QoS level
+    Retain     bool         // Retain flag
+    PacketID   uint16       // Packet ID (QoS > 0)
+    Properties *Properties  // MQTT 5.0 properties
+    Duplicate  bool         // Duplicate flag
 }
 ```
 
 ### MessageHandler
 
-Signature du handler de messages.
+Message handler signature.
 
 ```go
 type MessageHandler func(client *Client, msg *Message)
@@ -350,19 +350,19 @@ type MessageHandler func(client *Client, msg *Message)
 
 ### Subscription
 
-Options de souscription.
+Subscription options.
 
 ```go
 type Subscription struct {
-    Topic             string         // Filtre de topic
-    QoS               QoS            // QoS demandé
-    NoLocal           bool           // Ne pas recevoir ses propres messages
-    RetainAsPublished bool           // Garder le flag retain original
-    RetainHandling    RetainHandling // Gestion des messages retenus
+    Topic             string         // Topic filter
+    QoS               QoS            // Requested QoS
+    NoLocal           bool           // Don't receive own messages
+    RetainAsPublished bool           // Keep original retain flag
+    RetainHandling    RetainHandling // Retained message handling
 }
 ```
 
-## Exemple complet
+## Complete Example
 
 ```go
 package main
@@ -386,7 +386,7 @@ type SensorData struct {
 }
 
 func main() {
-    // Configuration du client
+    // Client configuration
     client := mqtt.NewClient(
         mqtt.WithServer("mqtt://localhost:1883"),
         mqtt.WithClientID("sensor-gateway"),
@@ -396,27 +396,27 @@ func main() {
         mqtt.WithAutoReconnect(true),
         mqtt.WithWill("gateways/sensor-gateway/status", []byte("offline"), mqtt.QoS1, true),
         mqtt.WithOnConnect(func(c *mqtt.Client) {
-            log.Println("Connecté au broker")
-            // Publier le statut online
+            log.Println("Connected to broker")
+            // Publish online status
             c.Publish(context.Background(), "gateways/sensor-gateway/status", []byte("online"), mqtt.QoS1, true)
         }),
         mqtt.WithOnConnectionLost(func(c *mqtt.Client, err error) {
-            log.Printf("Connexion perdue: %v", err)
+            log.Printf("Connection lost: %v", err)
         }),
     )
 
-    // Connexion
+    // Connect
     ctx := context.Background()
     if err := client.Connect(ctx); err != nil {
         log.Fatal(err)
     }
     defer client.Disconnect(ctx)
 
-    // Handler pour les commandes
+    // Command handler
     commandHandler := func(c *mqtt.Client, msg *mqtt.Message) {
-        log.Printf("Commande reçue: %s", string(msg.Payload))
+        log.Printf("Command received: %s", string(msg.Payload))
 
-        // Répondre si un topic de réponse est spécifié
+        // Reply if response topic is specified
         if msg.Properties != nil && msg.Properties.ResponseTopic != "" {
             response := []byte(`{"status":"ok"}`)
             c.PublishWithProperties(ctx, msg.Properties.ResponseTopic, response, mqtt.QoS1, false,
@@ -426,10 +426,10 @@ func main() {
         }
     }
 
-    // Souscrire aux commandes
+    // Subscribe to commands
     client.Subscribe(ctx, "gateways/sensor-gateway/commands", mqtt.QoS1, commandHandler)
 
-    // Publier des données périodiquement
+    // Publish data periodically
     ticker := time.NewTicker(5 * time.Second)
     defer ticker.Stop()
 
@@ -439,7 +439,7 @@ func main() {
     for {
         select {
         case <-sigCh:
-            log.Println("Arrêt...")
+            log.Println("Shutting down...")
             return
         case <-ticker.C:
             data := SensorData{
@@ -452,7 +452,7 @@ func main() {
             payload, _ := json.Marshal(data)
             token := client.Publish(ctx, "sensors/data", payload, mqtt.QoS1, false)
             if err := token.Wait(); err != nil {
-                log.Printf("Erreur de publication: %v", err)
+                log.Printf("Publish error: %v", err)
             }
         }
     }
