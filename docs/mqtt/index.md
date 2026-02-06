@@ -3,6 +3,7 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](./changelog)
 [![Go](https://img.shields.io/badge/go-1.21+-00ADD8.svg)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/edgeo-scada/mqtt/blob/main/LICENSE)
+[![GitHub](https://img.shields.io/badge/github-repo-black.svg?logo=github)](https://github.com/edgeo-scada/mqtt)
 
 Pure Go MQTT 5.0 client library with TLS, WebSocket, and connection pooling support.
 
