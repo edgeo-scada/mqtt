@@ -27,7 +27,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/edgeo-scada/mqtt/mqtt"
+	"github.com/edgeo-scada/mqtt"
 	"github.com/spf13/cobra"
 )
 

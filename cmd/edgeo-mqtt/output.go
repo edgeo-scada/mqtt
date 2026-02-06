@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/edgeo-scada/mqtt/mqtt"
+	"github.com/edgeo-scada/mqtt"
 )
 
 // OutputFormat represents the output format type.

@@ -12,31 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Example MQTT publisher demonstrating basic publish functionality.
+// Example MQTT subscriber demonstrating subscription functionality.
 package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/edgeo-scada/mqtt/mqtt"
+	"github.com/edgeo-scada/mqtt"
 )
 
 func main() {
+	// Message handler
+	messageHandler := func(client *mqtt.Client, msg *mqtt.Message) {
+		log.Printf("Received message on %s: %s", msg.Topic, string(msg.Payload))
+	}
+
 	// Create client with options
 	client := mqtt.NewClient(
 		mqtt.WithServer("mqtt://localhost:1883"),
-		mqtt.WithClientID("example-publisher"),
+		mqtt.WithClientID("example-subscriber"),
 		mqtt.WithCleanStart(true),
 		mqtt.WithKeepAlive(30*time.Second),
 		mqtt.WithAutoReconnect(true),
+		mqtt.WithDefaultMessageHandler(messageHandler),
 		mqtt.WithOnConnect(func(c *mqtt.Client) {
 			log.Println("Connected to broker")
+
+			// Resubscribe on reconnect
+			token := c.Subscribe(context.Background(), "test/#", mqtt.QoS1, messageHandler)
+			if err := token.Wait(); err != nil {
+				log.Printf("Failed to subscribe: %v", err)
+			} else {
+				log.Println("Subscribed to test/#")
+			}
 		}),
 		mqtt.WithOnConnectionLost(func(c *mqtt.Client, err error) {
 			log.Printf("Connection lost: %v", err)
@@ -52,32 +65,17 @@ func main() {
 	}
 	defer client.Disconnect(context.Background())
 
-	// Set up signal handling
+	// Subscribe to topics
+	token := client.Subscribe(context.Background(), "test/#", mqtt.QoS1, messageHandler)
+	if err := token.Wait(); err != nil {
+		log.Fatalf("Failed to subscribe: %v", err)
+	}
+	log.Println("Subscribed to test/#")
+
+	// Wait for signal
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
 
-	// Publish messages periodically
-	ticker := time.NewTicker(2 * time.Second)
-	defer ticker.Stop()
-
-	count := 0
-	for {
-		select {
-		case <-sigCh:
-			log.Println("Shutting down...")
-			return
-		case <-ticker.C:
-			count++
-			topic := "test/messages"
-			payload := fmt.Sprintf("Hello MQTT! Message #%d", count)
-
-			token := client.Publish(context.Background(), topic, []byte(payload), mqtt.QoS1, false)
-			if err := token.Wait(); err != nil {
-				log.Printf("Failed to publish: %v", err)
-				continue
-			}
-
-			log.Printf("Published message #%d to %s", count, topic)
-		}
-	}
+	log.Println("Shutting down...")
 }
