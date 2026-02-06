@@ -464,4 +464,5 @@ edgeo-mqtt sub -t "sensor/#" -o raw
 
 - [MQTT 5.0 Specification](https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html)
 - [Client Library Documentation](client.md)
-- [Examples](examples/)
+- [Publisher Example](examples/publisher.md)
+- [Subscriber Example](examples/subscriber.md)
